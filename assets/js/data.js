@@ -122,6 +122,36 @@ const data = [
         modal_title: "",
         modal_description: "",
         modal_media_url: ""
+      },  {
+        style: "downloadable",
+        name: "Fix All Expression",
+        description: "Refreshes expressions across all compositions and layers in an After Effects project.",
+        media_type: "image",
+        media_url: "assets/products/Fix-All-Expression/Fix-All-Expression.png",
+        poster_url: "",
+        badge_text: "FREE",
+        badge_color: "green",
+        button_text: "Download",
+        button_color: "green",
+        url: "assets/products/Fix-All-Expression/Fix-All-Expression.jsx",            // empty => "Coming Soon"
+        modal_title: "",
+        modal_description: "",
+        modal_media_url: ""
+      },  {
+        style: "downloadable",
+        name: "Convert Orientation to Rotation",
+        description: "Convert 3D Layer Orientation into X, Y, and Z Rotation values while preserving the original 3D direction as closely as possible.",
+        media_type: "image",
+        media_url: "assets/products/Convert-Orientation-to-Rotation/Convert-Orientation-to-Rotation.png",
+        poster_url: "",
+        badge_text: "FREE",
+        badge_color: "green",
+        button_text: "Download",
+        button_color: "green",
+        url: "assets/products/Convert-Orientation-to-Rotation/Convert-Orientation-to-Rotation.jsx",            // empty => "Coming Soon"
+        modal_title: "",
+        modal_description: "",
+        modal_media_url: ""
       }
 
     ]

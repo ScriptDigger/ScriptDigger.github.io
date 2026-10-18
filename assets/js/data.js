@@ -91,6 +91,37 @@ const data = [
         modal_title: "",
         modal_description: "",
         modal_media_url: ""
+      },  {
+        style: "downloadable",
+        name: "Project Font Changer",
+        description: "Search and replace fonts across a selected composition or the entire After Effects project.",
+        media_type: "image",
+        media_url: "assets/products/Project-Font-Changer/Project-Font-Changer.png",
+        poster_url: "",
+        badge_text: "FREE",
+        badge_color: "green",
+        button_text: "Download",
+        button_color: "green",
+        url: "assets/products/Project-Font-Changer/Project-Font-Changer.jsx",            // empty => "Coming Soon"
+        modal_title: "",
+        modal_description: "",
+        modal_media_url: ""
+      }
+,  {
+        style: "downloadable",
+        name: "Comps List Renamer",
+        description: "Quickly export and edit selected After Effects project item names in a text list, then apply the new names in seconds.",
+        media_type: "image",
+        media_url: "assets/products/Comps-List-Renamer/Comps-List-Renamer.png",
+        poster_url: "",
+        badge_text: "FREE",
+        badge_color: "green",
+        button_text: "Download",
+        button_color: "green",
+        url: "assets/products/Comps-List-Renamer/Comps-List-Renamer.jsx",            // empty => "Coming Soon"
+        modal_title: "",
+        modal_description: "",
+        modal_media_url: ""
       }
 
     ]

@@ -15,10 +15,7 @@ let searchTerm = "";
 /* Constants                                                           */
 /* ------------------------------------------------------------------ */
 
-const CARD_STYLES = ["wide_image_card", "downloadable", "embedded-player-modal"];
-
 const CARD_DEFAULTS = {
-  style: "wide_image_card",
   name: "",
   description: "",
   media_type: "auto",
@@ -26,19 +23,24 @@ const CARD_DEFAULTS = {
   poster_url: "",
   badge_text: "",
   badge_color: "red",
+  buttons: []
+};
+
+const BUTTON_DEFAULTS = {
   button_text: "",
-  button_color: "",
+  type: "link",
+  icon: "",
+  button_color: "light",
   url: "",
   modal_title: "",
   modal_description: "",
   modal_media_url: ""
 };
 
-const DEFAULT_BUTTON_TEXT = {
-  "wide_image_card": "Open resource",
-  "downloadable": "Download",
-  "embedded-player-modal": "Watch now"
-};
+const DEFAULT_BUTTON_TEXT = { link: "Open", modal: "Watch" };
+
+// Files with these extensions are downloaded instead of navigated to
+const DOWNLOAD_EXT = /\.(jsx|jsxbin|js|zip|rar|7z|ffx|aep|aet|mogrt|pdf|json|txt|psd|ai|exe|dmg)(?:[?#].*)?$/i;
 
 const icons = {
   play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 10 6-10 6z"></path></svg>',
@@ -77,7 +79,7 @@ function getYouTubeId(url) {
   return match ? match[1] : "";
 }
 
-/* Resolve a media field into { kind: "image" | "video" | "youtube", src } */
+/* Resolve a media field into { kind: "image" | "video" | "youtube" | "none", src } */
 function resolveMedia(url, type) {
   const src = safeUrl(url);
   if (!src) return { kind: "none", src: "" };
@@ -88,20 +90,36 @@ function resolveMedia(url, type) {
   return { kind: isVideoFile(src) ? "video" : "image", src };
 }
 
-/* One normalisation point: every card leaves here with the same shape */
+function normalizeButton(raw) {
+  const button = Object.assign({}, BUTTON_DEFAULTS);
+  Object.keys(BUTTON_DEFAULTS).forEach(key => {
+    if (raw && raw[key] !== undefined && raw[key] !== null) button[key] = String(raw[key]).trim();
+  });
+  if (button.type !== "modal") button.type = "link";
+  if (!button.button_color) button.button_color = "light";
+  return button;
+}
+
+/* Every card leaves here with exactly the same shape */
 function normalizeCard(raw) {
   const card = Object.assign({}, CARD_DEFAULTS);
   Object.keys(CARD_DEFAULTS).forEach(key => {
+    if (key === "buttons") return;
     if (raw && raw[key] !== undefined && raw[key] !== null) card[key] = String(raw[key]).trim();
   });
-  if (!CARD_STYLES.includes(card.style)) card.style = CARD_DEFAULTS.style;
   if (!["image", "video", "auto"].includes(card.media_type)) card.media_type = "auto";
-  if (/^free$/i.test(card.badge_text) && !raw.badge_color) card.badge_color = "green";
+  if (/^free$/i.test(card.badge_text) && !(raw && raw.badge_color)) card.badge_color = "green";
+
+  const rawButtons = raw && Array.isArray(raw.buttons) ? raw.buttons : [];
+  card.buttons = rawButtons
+    .map(normalizeButton)
+    // modal button with nothing to play => removed
+    .filter(b => b.type !== "modal" || safeUrl(b.modal_media_url || b.url));
   return card;
 }
 
 /* ------------------------------------------------------------------ */
-/* Media                                                               */
+/* Media (always 16:9)                                                 */
 /* ------------------------------------------------------------------ */
 
 function createPlaceholder(message, kind) {
@@ -127,7 +145,6 @@ function createPreviewVideo(src, poster, label) {
     const p = video.play();
     if (p && typeof p.catch === "function") p.catch(() => {});
   };
-  // Play only while visible (saves CPU with many cards)
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(entries => {
       entries.forEach(entry => (entry.isIntersecting ? play() : video.pause()));
@@ -154,7 +171,7 @@ function createPreviewImage(src, alt) {
 }
 
 function buildMediaFrame(card) {
-  const frame = makeElement("div", "media-frame wide-image");
+  const frame = makeElement("div", "media-frame");
   const label = card.name || "Resource";
   const media = resolveMedia(card.media_url, card.media_type);
   const poster = safeUrl(card.poster_url);
@@ -164,17 +181,9 @@ function buildMediaFrame(card) {
   } else if (media.kind === "image") {
     frame.appendChild(createPreviewImage(media.src, `${label} preview`));
   } else if (media.kind === "youtube") {
-    // A YouTube link used as the card preview -> use its thumbnail
     frame.appendChild(createPreviewImage(`https://i.ytimg.com/vi/${media.id}/hqdefault.jpg`, `${label} preview`));
   } else {
     frame.appendChild(createPlaceholder("Preview not available", "image"));
-  }
-
-  if (card.style === "embedded-player-modal") {
-    const overlay = makeElement("span", "media-play-overlay");
-    overlay.innerHTML = icons.play;
-    overlay.setAttribute("aria-hidden", "true");
-    frame.appendChild(overlay);
   }
 
   if (card.badge_text) {
@@ -228,24 +237,24 @@ function ensureModal() {
   return modalEl;
 }
 
-function openModal(card) {
+function openModal(card, button) {
   const modal = ensureModal();
   const stage = modal.querySelector(".player-modal-stage");
   stage.replaceChildren();
 
-  modal.querySelector(".player-modal-title").textContent = card.modal_title || card.name;
-  const descText = card.modal_description || card.description;
+  const title = button.modal_title || card.name;
+  const descText = button.modal_description || card.description;
+  modal.querySelector(".player-modal-title").textContent = title;
   const descEl = modal.querySelector(".player-modal-description");
   descEl.textContent = descText;
   descEl.hidden = !descText;
 
-  // Fallback chain: modal media -> card preview media
-  const media = resolveMedia(card.modal_media_url || card.media_url, "auto");
+  const media = resolveMedia(button.modal_media_url || button.url, "auto");
 
   if (media.kind === "youtube") {
     const iframe = document.createElement("iframe");
     iframe.src = `https://www.youtube-nocookie.com/embed/${media.id}?autoplay=1&rel=0`;
-    iframe.title = card.modal_title || card.name || "Video player";
+    iframe.title = title || "Video player";
     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
     iframe.allowFullscreen = true;
     iframe.referrerPolicy = "strict-origin-when-cross-origin";
@@ -258,7 +267,7 @@ function openModal(card) {
     video.playsInline = true;
     stage.appendChild(video);
   } else if (media.kind === "image") {
-    stage.appendChild(createPreviewImage(media.src, card.name || "Preview"));
+    stage.appendChild(createPreviewImage(media.src, title || "Preview"));
   } else {
     stage.appendChild(createPlaceholder("Nothing to play yet", "video"));
   }
@@ -278,7 +287,7 @@ function closeModal() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Cards                                                               */
+/* Buttons & cards                                                     */
 /* ------------------------------------------------------------------ */
 
 function createEmptyState(title, message) {
@@ -288,77 +297,87 @@ function createEmptyState(title, message) {
   return state;
 }
 
-function buildActionButton(card) {
-  const label = card.button_text || DEFAULT_BUTTON_TEXT[card.style];
-  const resourceUrl = safeUrl(card.url);
-  const colorClass = card.button_color ? ` ${card.button_color}` : "";
-  let action;
-
-  if (card.style === "embedded-player-modal") {
-    action = makeElement("button", `resource-link${colorClass}`);
-    action.type = "button";
-    action.appendChild(document.createTextNode(label));
-    const holder = makeElement("span");
-    holder.innerHTML = icons.play;
-    action.appendChild(holder);
-    action.addEventListener("click", () => openModal(card));
-    return action;
-  }
-
-  if (!resourceUrl) {
-    action = makeElement(
-      "span",
-      `resource-link${colorClass}`,
-      card.style === "downloadable" ? "Coming Soon" : "Resource link unavailable"
-    );
-    action.setAttribute("aria-disabled", "true");
-    action.style.opacity = ".55";
-    return action;
-  }
-
-  if (card.style === "downloadable") {
-    action = makeElement("a", `download-link${colorClass}`);
-    action.href = resourceUrl;
-    action.download = "";
-    action.appendChild(document.createTextNode(label));
-    const holder = makeElement("span");
-    holder.innerHTML = icons.download;
-    action.appendChild(holder);
+function buildIcon(button, fallbackSvg) {
+  const holder = makeElement("span", "card-btn-icon");
+  const iconUrl = safeUrl(button.icon);
+  if (iconUrl) {
+    const img = document.createElement("img");
+    img.src = iconUrl;
+    img.alt = "";
+    img.addEventListener("error", () => { holder.innerHTML = fallbackSvg; }, { once: true });
+    holder.appendChild(img);
   } else {
-    action = makeElement("a", `resource-link${colorClass}`);
-    action.href = resourceUrl;
-    action.appendChild(document.createTextNode(label));
-    const holder = makeElement("span");
-    holder.innerHTML = icons.external;
-    action.appendChild(holder);
+    holder.innerHTML = fallbackSvg;
   }
-  action.target = "_blank";
-  action.rel = "noopener noreferrer";
-  return action;
+  return holder;
+}
+
+function buildButton(card, button) {
+  const colorClass = `btn-${button.button_color.replace(/\s+/g, "-")}`;
+  const label = button.button_text || DEFAULT_BUTTON_TEXT[button.type];
+  let el;
+
+  if (button.type === "modal") {
+    el = makeElement("button", `card-btn ${colorClass}`);
+    el.type = "button";
+    el.appendChild(buildIcon(button, icons.play));
+    el.appendChild(makeElement("span", "card-btn-label", label));
+    el.addEventListener("click", () => openModal(card, button));
+    return el;
+  }
+
+  // type: "link"
+  const url = safeUrl(button.url);
+  const isDownload = DOWNLOAD_EXT.test(url);
+  const fallbackIcon = isDownload ? icons.download : icons.external;
+
+  if (!url) {
+    el = makeElement("span", `card-btn ${colorClass}`);
+    el.setAttribute("aria-disabled", "true");
+    el.classList.add("is-disabled");
+  } else {
+    el = makeElement("a", `card-btn ${colorClass}`);
+    el.href = url;
+    el.target = "_blank";
+    el.rel = "noopener noreferrer";
+    if (isDownload) el.download = "";
+  }
+  el.appendChild(buildIcon(button, fallbackIcon));
+  el.appendChild(makeElement("span", "card-btn-label", label));
+  return el;
 }
 
 function createCard(rawCard) {
   const card = normalizeCard(rawCard);
-  const article = makeElement("article", `resource-card card-${card.style}`);
-  article.dataset.style = card.style;
+  const article = makeElement("article", "resource-card");
 
   const mediaFrame = buildMediaFrame(card);
   const body = makeElement("div", "card-body");
   body.appendChild(makeElement("h3", "card-title", card.name || "Untitled resource"));
   body.appendChild(makeElement("p", "card-description", card.description || "No description available."));
-  body.appendChild(buildActionButton(card));
 
-  // Modal cards: the whole media area is clickable too
-  if (card.style === "embedded-player-modal") {
+  if (card.buttons.length) {
+    const actions = makeElement("div", "card-actions");
+    card.buttons.forEach(button => actions.appendChild(buildButton(card, button)));
+    body.appendChild(actions);
+  }
+
+  // If the card has a modal button, clicking the media opens the first one
+  const firstModal = card.buttons.find(b => b.type === "modal");
+  if (firstModal) {
     mediaFrame.classList.add("is-clickable");
     mediaFrame.tabIndex = 0;
     mediaFrame.setAttribute("role", "button");
     mediaFrame.setAttribute("aria-label", `Play ${card.name}`);
-    mediaFrame.addEventListener("click", () => openModal(card));
+    const overlay = makeElement("span", "media-play-overlay");
+    overlay.innerHTML = icons.play;
+    overlay.setAttribute("aria-hidden", "true");
+    mediaFrame.appendChild(overlay);
+    mediaFrame.addEventListener("click", () => openModal(card, firstModal));
     mediaFrame.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        openModal(card);
+        openModal(card, firstModal);
       }
     });
   }

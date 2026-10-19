@@ -49,6 +49,16 @@ const helpGuide = {
 
 
 const data = [
+   /**
+   * 
+   * 
+   * 
+   *       Products
+   * 
+   * 
+   * 
+   */
+
   {
     button_name: "Products",
     header_logo: "assets/images/ae.png",
@@ -87,6 +97,16 @@ const data = [
       }
     ]
   },
+   /**
+   * 
+   * 
+   * 
+   *       Free Scripts
+   * 
+   * 
+   * 
+   */
+
   {
     button_name: "Free Tools",
     header_logo: "assets/images/box.png",
@@ -234,34 +254,17 @@ const data = [
       }
     ]
   },
-  {
-    button_name: "Tutorials",
-    header_logo: "assets/images/video.webp",
-    title: "Learn with Tutorials",
-    subtitle: "Follow step-by-step guides, learn new techniques, and get more out of your tools.",
-    cards: [
-      {
-        name: "Getting Started with DJ Subtitle",
-        description: "A quick walkthrough of installing and using the script.",
-        media_type: "image",
-        media_url: "assets/images/dj-subtitle.jpg",
-        badge_text: "",
-        badge_color: "",
-        buttons: [
-          {
-            button_text: "Watch Tutorial",
-            type: "modal",
-            icon: "",
-            button_color: "purple",
-            url: "",
-            modal_title: "Getting Started with DJ Subtitle",
-            modal_description: "Learn how to install the script and style your first subtitles.",
-            modal_media_url: "https://youtu.be/7c7NmvvK9KM"
-          }
-        ]
-      }
-    ]
-  },
+
+  /**
+   * 
+   * 
+   * 
+   *       TUTORIALS
+   * 
+   * 
+   * 
+   */
+
   {
     button_name: "Tutorials",
     header_logo: "assets/images/video.webp",
@@ -290,6 +293,7 @@ const data = [
       }
     ]
   }
+  
 ];
 
 

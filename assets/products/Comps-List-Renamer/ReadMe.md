@@ -1,5 +1,7 @@
 # Selected Names – After Effects Script
 
+![Ae Script Free Download](https://ScriptDigger.github.io/assets/products/Comps-List-Renamer/Comps-List-Renamer.png)
+
 ## Overview
 Selected Names is a simple Adobe After Effects script that lets you quickly export the names of selected project items to a text box and rename them by editing the list.
 

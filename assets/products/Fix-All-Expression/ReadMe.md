@@ -1,5 +1,7 @@
 # FX Motion – Fix All Expressions
 
+![Ae Script Free Download](https://ScriptDigger.github.io/assets/products/Fix-All-Expression/Fix-All-Expression.png)
+
 ## Overview
 A utility script for Adobe After Effects that refreshes expressions across the entire project by temporarily disabling and re-enabling them.
 

@@ -1,5 +1,7 @@
 # Add Bulk Marker
 
+![Ae Script Free Download](https://ScriptDigger.github.io/assets/products/Add-Bulk-Marker/Add-Bulk-Marker.jpg)
+
 Add multiple After Effects markers at once by entering one comment per line, then apply them to the selected layers or directly to the composition.
 
 ## How to Use

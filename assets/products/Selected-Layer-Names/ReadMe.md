@@ -1,5 +1,7 @@
 # Selected Layer Names
 
+![Ae Script Free Download](https://ScriptDigger.github.io/assets/products/Selected-Layer-Names/Selected-Layer-Names.png)
+
 A simple After Effects script for quickly viewing and renaming multiple selected layers at once.
 
 ## How to Use

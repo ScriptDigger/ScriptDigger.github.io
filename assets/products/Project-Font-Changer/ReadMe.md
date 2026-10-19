@@ -1,5 +1,7 @@
 # Font Changer
 
+![Ae Script Free Download](https://ScriptDigger.github.io/assets/products/Project-Font-Changer/Project-Font-Changer.png)
+
 Font Changer is an After Effects script for finding fonts used in your project and quickly applying a selected font to text layers.
 
 ## How It Works

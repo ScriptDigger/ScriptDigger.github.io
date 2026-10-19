@@ -1,5 +1,7 @@
 # Advanced Property Randomizer
 
+![Ae Script Free Download](https://ScriptDigger.github.io/assets/products/property-randomizer/property-randomizer.jpg)
+
 ## What Is It?
 
 **Advanced Property Randomizer** is an Adobe After Effects script that

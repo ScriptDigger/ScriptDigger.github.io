@@ -212,6 +212,53 @@ const data = [
             modal_media_url: ""
           }
         ]
+      }    ,  {
+        name: "Selected Layer Names",
+        description: "Quickly view, edit, and rename multiple selected layers in After Effects.",
+        media_type: "image",
+        media_url: "assets/products/Selected-Layer-Names/Selected-Layer-Names.png",
+        badge_text: "FREE",
+        badge_color: "green-border",
+        buttons: [
+          {
+            button_text: "Download",
+            type: "link",
+            icon: "",
+            button_color: "green",
+            url: "assets/products/Selected-Layer-Names/Selected-Layer-Names.jsx",
+            modal_title: "",
+            modal_description: "",
+            modal_media_url: ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    button_name: "Tutorials",
+    header_logo: "assets/images/video.webp",
+    title: "Learn with Tutorials",
+    subtitle: "Follow step-by-step guides, learn new techniques, and get more out of your tools.",
+    cards: [
+      {
+        name: "Getting Started with DJ Subtitle",
+        description: "A quick walkthrough of installing and using the script.",
+        media_type: "image",
+        media_url: "assets/images/dj-subtitle.jpg",
+        badge_text: "",
+        badge_color: "",
+        buttons: [
+          {
+            button_text: "Watch Tutorial",
+            type: "modal",
+            icon: "",
+            button_color: "purple",
+            url: "",
+            modal_title: "Getting Started with DJ Subtitle",
+            modal_description: "Learn how to install the script and style your first subtitles.",
+            modal_media_url: "https://youtu.be/7c7NmvvK9KM"
+          }
+        ]
       }
     ]
   },

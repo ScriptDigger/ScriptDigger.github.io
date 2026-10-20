@@ -70,7 +70,7 @@ const data = [
         description: "For testing the script and using it with standard subtitles, you can use this template.",
         media_type: "image",
         media_url: "assets/images/dj-subtitle.jpg",
-        badge_text: "15$",
+        badge_text: "16$",
         badge_color: "dark-border",
         buttons: [
           {
